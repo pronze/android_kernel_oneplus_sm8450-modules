@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2017-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 #ifndef _CAM_EEPROM_DEV_H_
 #define _CAM_EEPROM_DEV_H_
@@ -49,7 +48,6 @@ enum cam_eeprom_state {
  * @addr            :   Address
  * @data            :   data
  * @delay           :   Delay
- * @is_delay_hw     :   HW/SW Delay
  *
  */
 struct cam_eeprom_map_t {
@@ -59,7 +57,6 @@ struct cam_eeprom_map_t {
 	uint32_t data;
 	uint32_t data_type;
 	uint32_t delay;
-	bool is_delay_hw;
 };
 
 /**
@@ -195,6 +192,13 @@ struct cam_eeprom_ctrl_t {
 	uint16_t is_multimodule_mode;
 	struct i2c_settings_array wr_settings;
 	struct eebin_info eebin_info;
+#ifdef OPLUS_FEATURE_CAMERA_COMMON
+	uint8_t change_cci;
+	struct camera_io_master io_master_info_ois;
+	enum cci_i2c_master_t cci_i2c_master_ois;
+	enum cci_device_num cci_num_ois;
+#endif
+
 };
 
 int32_t cam_eeprom_update_i2c_info(struct cam_eeprom_ctrl_t *e_ctrl,
