@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022,2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/gpio.h>
@@ -267,14 +267,12 @@ static int lpi_gpio_set_mux(struct pinctrl_dev *pctldev, unsigned int function,
 
 	pad = pctldev->desc->pins[pin].drv_data;
 
-	if (pad != NULL) {
-		pad->function = function;
+	pad->function = function;
 
-		val = lpi_gpio_read(pad, LPI_GPIO_REG_VAL_CTL);
-		val &= ~(LPI_GPIO_REG_FUNCTION_MASK);
-		val |= pad->function << LPI_GPIO_REG_FUNCTION_SHIFT;
-		lpi_gpio_write(pad, LPI_GPIO_REG_VAL_CTL, val);
-	}
+	val = lpi_gpio_read(pad, LPI_GPIO_REG_VAL_CTL);
+	val &= ~(LPI_GPIO_REG_FUNCTION_MASK);
+	val |= pad->function << LPI_GPIO_REG_FUNCTION_SHIFT;
+	lpi_gpio_write(pad, LPI_GPIO_REG_VAL_CTL, val);
 	return 0;
 }
 
@@ -732,7 +730,7 @@ static int lpi_pinctrl_probe(struct platform_device *pdev)
 	} else {
 		slew_base = NULL;
 		dev_dbg(dev, "error in reading lpi slew register: %d\n",
-			ret);
+			__func__, ret);
 	}
 
 	pindesc = devm_kcalloc(dev, npins, sizeof(*pindesc), GFP_KERNEL);
