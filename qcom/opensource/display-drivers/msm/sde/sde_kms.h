@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Copyright (c) 2015-2021, The Linux Foundation. All rights reserved.
  * Copyright (C) 2013 Red Hat
  * Author: Rob Clark <robdclark@gmail.com>
@@ -42,6 +42,9 @@
 #include "sde_power_handle.h"
 #include "sde_irq.h"
 #include "sde_core_perf.h"
+#ifdef OPLUS_FEATURE_DISPLAY
+#include <soc/oplus/system/oplus_project.h>
+#endif /* OPLUS_FEATURE_DISPLAY */
 
 #define DRMID(x) ((x) ? (x)->base.id : -1)
 
@@ -93,6 +96,15 @@
 
 #define CHECK_LAYER_BOUNDS(offset, size, max_size) \
 	(((size) > (max_size)) || ((offset) > ((max_size) - (size))))
+
+#ifdef OPLUS_FEATURE_DISPLAY
+#include <soc/oplus/system/oplus_mm_kevent_fb.h>
+#define SDE_MM_ERROR(fmt, ...) \
+	do { \
+		pr_err("[sde error]" fmt, ##__VA_ARGS__); \
+		mm_fb_display_kevent_named(MM_FB_KEY_RATELIMIT_1H, fmt, ##__VA_ARGS__); \
+	} while(0)
+#endif /* OPLUS_FEATURE_DISPLAY */
 
 /**
  * ktime_compare_safe - compare two ktime structures
@@ -310,7 +322,6 @@ struct sde_kms {
 	bool first_kickoff;
 	bool qdss_enabled;
 	bool pm_suspend_clk_dump;
-	bool freeze_late;
 
 	cpumask_t irq_cpu_mask;
 	atomic_t irq_vote_count;
@@ -484,11 +495,11 @@ void *sde_debugfs_get_root(struct sde_kms *sde_kms);
  * These functions/definitions allow for building up a 'sde_info' structure
  * containing one or more "key=value\n" entries.
  */
-#if IS_ENABLED(CONFIG_DRM_LOW_MSM_MEM_FOOTPRINT)
-#define SDE_KMS_INFO_MAX_SIZE	(1 << 12)
-#else
-#define SDE_KMS_INFO_MAX_SIZE	(1 << 14)
-#endif
+#ifdef OPLUS_FEATURE_DISPLAY
+#define SDE_KMS_INFO_MAX_SIZE	8192
+#else /* OPLUS_FEATURE_DISPLAY */
+#define SDE_KMS_INFO_MAX_SIZE	4096
+#endif /* OPLUS_FEATURE_DISPLAY */
 
 /**
  * struct sde_kms_info - connector information structure container

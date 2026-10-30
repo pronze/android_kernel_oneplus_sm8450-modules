@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  * Copyright (c) 2015-2021, The Linux Foundation. All rights reserved.
  */
 
@@ -317,11 +316,10 @@ struct dsi_ctrl {
 	bool cmd_mode;
 	u32 cmd_trigger_line;
 	u32 cmd_trigger_frame;
-	atomic_t cmd_success_line;
-	atomic_t cmd_success_frame;
+	u32 cmd_success_line;
+	u32 cmd_success_frame;
 	u32 cmd_engine_refcount;
 	u32 pending_cmd_flags;
-	atomic64_t cmd_success_ts;
 };
 
 /**
@@ -926,4 +924,5 @@ int dsi_ctrl_get_io_resources(struct msm_io_res *io_res);
  * dsi_ctrl_toggle_error_interrupt_status() - Toggles error interrupt status
  */
 void dsi_ctrl_toggle_error_interrupt_status(struct dsi_ctrl *dsi_ctrl, bool enable);
+int dsi_ctrl_override_dma_cmd_trig(struct dsi_ctrl *dsi_ctrl, enum dsi_trigger_type type);
 #endif /* _DSI_CTRL_H_ */

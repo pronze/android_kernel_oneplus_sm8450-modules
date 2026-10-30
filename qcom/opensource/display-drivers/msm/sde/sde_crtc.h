@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Copyright (c) 2015-2021 The Linux Foundation. All rights reserved.
  * Copyright (C) 2013 Red Hat
  * Author: Rob Clark <robdclark@gmail.com>
@@ -36,7 +36,7 @@
 
 /* define the maximum number of in-flight frame events */
 /* Expand it to 2x for handling atleast 2 connectors safely */
-#define SDE_CRTC_EVENT_SIZE	(4 * 2)
+#define SDE_CRTC_FRAME_EVENT_SIZE	(4 * 2)
 
 /**
  * enum sde_crtc_client_type: crtc client type
@@ -149,20 +149,6 @@ struct sde_crtc_frame_event {
 	struct list_head list;
 	ktime_t ts;
 	u32 event;
-};
-
-/**
- * struct sde_crtc_vblank_event: vblank notify event
- * @work:	base work structure
- * @crtc:	Pointer to crtc handling this event
- * @list:	vblank list
- * @ts:		vblank timestamp
- */
-struct sde_crtc_vblank_event {
-	struct kthread_work work;
-	struct drm_crtc *crtc;
-	struct list_head list;
-	ktime_t ts;
 };
 
 /**
@@ -303,10 +289,8 @@ struct sde_frame_data {
  * @kickoff_in_progress : boolean entry to check if kickoff is in progress
  * @frame_events  : static allocation of in-flight frame events
  * @frame_event_list : available frame event list
- * @vblank_events  : static allocation of in-flight vblank events
- * @vblank_event_list : available vblank event list
  * @spin_lock     : spin lock for transaction status, etc...
- * @event_spin_lock     : spin lock for all the event lists
+ * @fevent_spin_lock     : spin lock for frame event
  * @event_thread  : Pointer to event handler thread
  * @event_worker  : Event worker queue
  * @event_cache   : Local cache of event worker structures
@@ -394,12 +378,10 @@ struct sde_crtc {
 	struct mutex crtc_cp_lock;
 
 	atomic_t frame_pending;
-	struct sde_crtc_frame_event frame_events[SDE_CRTC_EVENT_SIZE];
+	struct sde_crtc_frame_event frame_events[SDE_CRTC_FRAME_EVENT_SIZE];
 	struct list_head frame_event_list;
-	struct sde_crtc_vblank_event vblank_events[SDE_CRTC_EVENT_SIZE];
-	struct list_head vblank_event_list;
 	spinlock_t spin_lock;
-	spinlock_t event_spin_lock;
+	spinlock_t fevent_spin_lock;
 	bool kickoff_in_progress;
 	unsigned long revalidate_mask;
 
@@ -461,6 +443,7 @@ enum sde_crtc_dirty_flags {
 	SDE_CRTC_DIRTY_DEST_SCALER,
 	SDE_CRTC_DIRTY_DIM_LAYERS,
 	SDE_CRTC_NOISE_LAYER,
+	SDE_CRTC_DIRTY_UIDLE,
 	SDE_CRTC_DIRTY_MAX,
 };
 
@@ -473,6 +456,7 @@ enum sde_crtc_dirty_flags {
  * @num_connectors: Number of associated drm connectors
  * @rsc_client    : sde rsc client when mode is valid
  * @is_ppsplit    : Whether current topology requires PPSplit special handling
+ * @in_fsc_mode   : Whether current state is in fsc mode
  * @bw_control    : true if bw/clk controlled by core bw/clk properties
  * @bw_split_vote : true if bw controlled by llcc/dram bw properties
  * @crtc_roi      : Current CRTC ROI. Possibly sub-rectangle of mode.
@@ -513,6 +497,7 @@ struct sde_crtc_state {
 	bool bw_split_vote;
 
 	bool is_ppsplit;
+	bool in_fsc_mode;
 	struct sde_rect crtc_roi;
 	struct sde_rect lm_bounds[MAX_MIXERS_PER_CRTC];
 	struct sde_rect lm_roi[MAX_MIXERS_PER_CRTC];
@@ -581,13 +566,6 @@ struct sde_crtc_irq_info {
 	((S) && ((X) < CRTC_PROP_COUNT) ? ((S)->property_values[(X)].value) : 0)
 
 /**
- * sde_crtc_is_connector_fsc - check if connector is in fsc mode
- * @cstate: Pointer to sde crtc state
- * Returns: true if fsc to fsc mode else false
- */
-bool sde_crtc_is_connector_fsc(struct sde_crtc_state *cstate);
-
-/**
  * sde_crtc_get_mixer_width - get the mixer width
  * Mixer width will be same as panel width(/2 for split)
  * unless destination scaler feature is enabled
@@ -603,7 +581,7 @@ static inline int sde_crtc_get_mixer_width(struct sde_crtc *sde_crtc,
 	if (cstate->num_ds_enabled)
 		mixer_width = cstate->ds_cfg[0].lm_width;
 	else
-		mixer_width = GET_MODE_WIDTH(sde_crtc_is_connector_fsc(cstate), mode) /
+		mixer_width = GET_MODE_WIDTH(cstate->in_fsc_mode, mode) /
 				sde_crtc->num_mixers;
 
 	return mixer_width;
@@ -621,7 +599,7 @@ static inline int sde_crtc_get_mixer_height(struct sde_crtc *sde_crtc,
 		return 0;
 
 	return (cstate->num_ds_enabled ? cstate->ds_cfg[0].lm_height :
-			GET_MODE_HEIGHT(sde_crtc_is_connector_fsc(cstate), mode));
+			GET_MODE_HEIGHT(cstate->in_fsc_mode, mode));
 }
 
 /**
@@ -1092,12 +1070,5 @@ struct drm_encoder *sde_crtc_get_src_encoder_of_clone(struct drm_crtc *crtc);
  * _sde_crtc_vm_release_notify- send event to usermode on vm release
  */
 void _sde_crtc_vm_release_notify(struct drm_crtc *crtc);
-
-/**
- * sde_crtc_state_setup_connector - populate connectors in sde crtc state
- * @state: Pointer to drm crtc state
- * @dev: Pointer to drm device
- */
-void sde_crtc_state_setup_connectors(struct drm_crtc_state *state, struct drm_device *dev);
 
 #endif /* _SDE_CRTC_H_ */

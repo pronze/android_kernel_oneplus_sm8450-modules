@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Copyright (c) 2015-2021, The Linux Foundation. All rights reserved.
  */
 
@@ -110,7 +110,6 @@
 
 #define MAX_XIN_COUNT 16
 #define SSPP_SUBBLK_COUNT_MAX 2
-#define MAX_CWB_SESSIONS 1
 
 #define SDE_CTL_CFG_VERSION_1_0_0       0x100
 #define MAX_INTF_PER_CTL_V1                 2
@@ -544,8 +543,7 @@ enum {
  * @SDE_INTF_WD_TIMER          INTF block has WD Timer support
  * @SDE_INTF_STATUS             INTF block has INTF_STATUS register
  * @SDE_INTF_RESET_COUNTER      INTF block has frame/line counter reset support
- * @SDE_INTF_PANEL_VSYNC_TS     INTF block has panel vsync timestamp logged
- * @SDE_INTF_MDP_VSYNC_TS       INTF block has mdp vsync timestamp logged
+ * @SDE_INTF_VSYNC_TIMESTAMP    INTF block has vsync timestamp logged
  * @SDE_INTF_AVR_STATUS         INTF block has AVR_STATUS field in AVR_CONTROL register
  * @SDE_INTF_MAX
  */
@@ -556,8 +554,7 @@ enum {
 	SDE_INTF_WD_TIMER,
 	SDE_INTF_STATUS,
 	SDE_INTF_RESET_COUNTER,
-	SDE_INTF_PANEL_VSYNC_TS,
-	SDE_INTF_MDP_VSYNC_TS,
+	SDE_INTF_VSYNC_TIMESTAMP,
 	SDE_INTF_AVR_STATUS,
 	SDE_INTF_MAX
 };
@@ -1577,7 +1574,6 @@ struct sde_perf_cfg {
 
  * @min_display_width   minimum display width support.
  * @min_display_height  minimum display height support.
- * @in_rot_maxheight    max pre rotated height for inline rotation.
  * @csc_type           csc or csc_10bit support.
  * @smart_dma_rev      Supported version of SmartDMA feature.
  * @ctl_rev            supported version of control path.
@@ -1594,7 +1590,6 @@ struct sde_perf_cfg {
  * @ubwc_bw_calc_version indicate how UBWC BW has to be calculated
  * @skip_inline_rot_thresh    Skip inline rotation threshold
  * @has_idle_pc        indicate if idle power collapse feature is supported
- * @enable_hibernation indicate if hibernation feature is supported
  * @allowed_dsc_reservation_switch  intf to which dsc reservation switch is supported
  * @has_reduced_ob_max	indicate if DSC size is limited to 10k
  * @wakeup_with_touch  indicate early wake up display with input touch event
@@ -1649,7 +1644,6 @@ struct sde_perf_cfg {
  * @has_vbif_clk_split: VBIF clock split supported
  * @mdss_hw_block_size  Max offset of MDSS_HW block (0 offset), used for debug
  * @inline_rot_formats formats supported by the inline rotator feature
- * @max_cwb             max number of cwb supported
  * @irq_offset_list     list of sde_intr_irq_offsets to initialize irq table
  * @rc_count	number of rounded corner hardware instances
  * @demura_count number of demura hardware instances
@@ -1675,7 +1669,6 @@ struct sde_mdss_cfg {
 	u32 max_display_height;
 	u32 min_display_width;
 	u32 min_display_height;
-	u32 in_rot_maxheight;
 
 	u32 csc_type;
 	u32 smart_dma_rev;
@@ -1694,7 +1687,6 @@ struct sde_mdss_cfg {
 	u32 ubwc_bw_calc_version;
 	bool skip_inline_rot_threshold;
 	bool has_idle_pc;
-	bool enable_hibernation;
 	u32 allowed_dsc_reservation_switch;
 	bool has_reduced_ob_max;
 	bool wakeup_with_touch;
@@ -1813,7 +1805,6 @@ struct sde_mdss_cfg {
 	u32 dcwb_count;
 
 	/* Add additional block data structures here */
-	u32 max_cwb;
 
 	struct sde_perf_cfg perf;
 	struct sde_format_extended *dma_formats;
