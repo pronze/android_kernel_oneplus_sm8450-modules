@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
  */
 
 #ifndef CAM_OPE_HW_MGR_H
@@ -61,8 +60,13 @@
 #define CLK_HW_MAX                 0x1
 
 #define OPE_DEVICE_IDLE_TIMEOUT    400
+#ifdef OPLUS_FEATURE_CAMERA_COMMON
+#define OPE_REQUEST_RT_TIMEOUT        500
+#define OPE_REQUEST_NRT_TIMEOUT        500
+#else
 #define OPE_REQUEST_RT_TIMEOUT        200
 #define OPE_REQUEST_NRT_TIMEOUT        400
+#endif
 
 /**
  * struct cam_ope_clk_bw_request_v2
@@ -221,7 +225,6 @@ struct cdm_dmi_cmd {
 /**
  * struct ope_debug_buffer
  *
- * @mem_handle:       Memory handle
  * @cpu_addr:         CPU address
  * @iova_addr:        IOVA address
  * @len:              Buffer length
@@ -229,7 +232,6 @@ struct cdm_dmi_cmd {
  * @offset:	      buffer offset
  */
 struct ope_debug_buffer {
-	uint32_t mem_handle;
 	uintptr_t cpu_addr;
 	dma_addr_t iova_addr;
 	size_t len;
