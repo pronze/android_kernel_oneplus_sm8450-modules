@@ -22,7 +22,7 @@ ccflags-y += -DQCOM_PLATFORM
 
 ifeq ($(CONFIG_OPLUS_FINGERPRINT_GKI_ENABLE),y)
 #tp for gki
-ccflags-y += -I$(srctree)/../../vendor/oplus/kernel/touchpanel/oplus_touchscreen_v2/touchpanel_notify
+ccflags-y += -I$(srctree)/../../sm8450-modules/oplus/kernel/touchpanel/oplus_touchscreen_v2/touchpanel_notify
 endif
 
 obj-$(CONFIG_UFF_FINGERPRINT) += uff_fp_driver.o
@@ -59,7 +59,7 @@ ccflags-$(CONFIG_FP_SUPPLY_MODE_LDO) += -DCONFIG_FP_SUPPLY_MODE_LDO
 
 ifeq ($(CONFIG_OPLUS_FINGERPRINT_GKI_ENABLE),y)
 #tp for gki
-ccflags-y += -I$(srctree)/../vendor/oplus/kernel/touchpanel/oplus_touchscreen_v2/touchpanel_notify
+ccflags-y += -I$(srctree)/../sm8450-modules/oplus/kernel/touchpanel/oplus_touchscreen_v2/touchpanel_notify
 endif
 
 obj-$(CONFIG_UFF_FINGERPRINT) += uff_fp_driver.o
