@@ -7,11 +7,6 @@
 #include "cam_req_mgr_workq.h"
 #include "cam_debug_util.h"
 #include "cam_common_util.h"
-#include <linux/sched/types.h>
-
-struct sched_param {
-	int sched_priority;
-};
 
 #define WORKQ_ACQUIRE_LOCK(workq, flags) {\
 	if ((workq)->in_irq) \
