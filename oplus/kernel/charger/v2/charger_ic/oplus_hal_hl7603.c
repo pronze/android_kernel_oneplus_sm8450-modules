@@ -29,9 +29,9 @@
 #include <oplus_chg.h>
 #include <oplus_mms_gauge.h>
 #include <oplus_chg_monitor.h>
-
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
-
+#endif
 static int hl7603_debug_track = 0;
 module_param(hl7603_debug_track, int, 0644);
 MODULE_PARM_DESC(hl7603_debug_track, "debug track");

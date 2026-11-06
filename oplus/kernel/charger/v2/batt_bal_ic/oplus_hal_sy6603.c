@@ -28,7 +28,9 @@
 #include <oplus_chg.h>
 #include <oplus_batt_bal.h>
 #include "oplus_hal_sy6603.h"
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
+#endif
 #include "../monitor/oplus_chg_track.h"
 #if IS_ENABLED(CONFIG_OPLUS_FEATURE_CHG_DEBUG_KIT)
 #include <debug-kit.h>

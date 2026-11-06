@@ -11067,6 +11067,7 @@ u32 oplus_chg_get_pps_status(void)
 	return pst->prop[USB_GET_PPS_STATUS];
 }
 
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 int oplus_check_cc_mode(void) {
 	int rc = 0;
 	struct battery_chg_dev *bcdev = NULL;
@@ -11094,6 +11095,12 @@ int oplus_check_cc_mode(void) {
 	else
 		return MODE_SRC;
 }
+#else
+static int oplus_check_cc_mode(void)
+{
+	return -ENOTSUPP;
+}
+#endif /* CONFIG_OPLUS_CHG_TEST_KIT */
 
 int oplus_chg_set_pps_config(int vbus_mv, int ibus_ma)
 {

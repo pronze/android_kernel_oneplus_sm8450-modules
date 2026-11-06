@@ -29,9 +29,9 @@
 #include <oplus_chg.h>
 #include <oplus_mms_gauge.h>
 #include <oplus_chg_monitor.h>
-
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
-
+#endif
 static int tps6128xd_debug_track = 0;
 module_param(tps6128xd_debug_track, int, 0644);
 MODULE_PARM_DESC(tps6128xd_debug_track, "debug track");
@@ -928,6 +928,7 @@ static struct device_attribute *tps6128xd_attributes[] = {
 };
 #endif
 
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 static void oplus_tps6128xd_retry_init_work(struct work_struct *work)
 {
 	struct delayed_work *dwork = to_delayed_work(work);
@@ -938,6 +939,7 @@ static void oplus_tps6128xd_retry_init_work(struct work_struct *work)
 	if (!chip->i2c_success)
 		schedule_delayed_work(&chip->retry_init_work, msecs_to_jiffies(5000));
 }
+#endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0))
 static int tps6128xd_driver_probe(struct i2c_client *client)

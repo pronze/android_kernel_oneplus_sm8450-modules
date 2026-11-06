@@ -34,7 +34,9 @@
 #endif
 
 #include "oplus_hal_sn28z729.h"
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
+#endif
 #include <linux/delay.h>
 #include <linux/gfp.h>
 #include <linux/i2c.h>
