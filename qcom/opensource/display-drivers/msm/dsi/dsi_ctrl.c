@@ -407,9 +407,6 @@ static void dsi_ctrl_dma_cmd_wait_for_done(struct dsi_ctrl *dsi_ctrl)
 			DSI_CTRL_MM_ERR(dsi_ctrl, "DisplayDriverID@@416$$dma_tx done but irq not triggered, status=%X, mask=%X\n",
 					status, mask);
 #endif /* OPLUS_FEATURE_DISPLAY */
-#if IS_ENABLED(CONFIG_OPLUS_FEATURE_THEIA)
-			theia_send_event(THEIA_EVENT_PTR_TIMEOUT_BLACKSCREEN, THEIA_LOGINFO_KERNEL_LOG, current->pid, "dma_tx irq trigger error");
-#endif
 			status |= (DSI_CMD_MODE_DMA_DONE | DSI_BTA_DONE);
 			dsi_hw_ops.clear_interrupt_status(&dsi_ctrl->hw,
 					status);
@@ -1183,9 +1180,6 @@ static int dsi_ctrl_enable_supplies(struct dsi_ctrl *dsi_ctrl, bool enable)
 #ifdef OPLUS_FEATURE_DISPLAY
 			DSI_CTRL_MM_ERR(dsi_ctrl, "DisplayDriverID@@406$$Power resource enable failed, rc=%d\n", rc);
 #endif /* OPLUS_FEATURE_DISPLAY */
-#if IS_ENABLED(CONFIG_OPLUS_FEATURE_THEIA)
-			theia_send_event(THEIA_EVENT_HARDWARE_ERROR, THEIA_LOGINFO_KERNEL_LOG, current->pid, "Power resource enable failed");
-#endif
 			goto error;
 		}
 
@@ -1197,9 +1191,6 @@ static int dsi_ctrl_enable_supplies(struct dsi_ctrl *dsi_ctrl, bool enable)
 #ifdef OPLUS_FEATURE_DISPLAY
 				DSI_CTRL_MM_ERR(dsi_ctrl, "DisplayDriverID@@406$$failed to enable host power regs\n");
 #endif /* OPLUS_FEATURE_DISPLAY */
-#if IS_ENABLED(CONFIG_OPLUS_FEATURE_THEIA)
-				theia_send_event(THEIA_EVENT_HARDWARE_ERROR, THEIA_LOGINFO_KERNEL_LOG, current->pid, "failed to enable host power regs");
-#endif
 				goto error_get_sync;
 			}
 		}
