@@ -54,7 +54,9 @@
 #include <oplus_mms_gauge.h>
 #include <oplus_smart_chg.h>
 #include <oplus_mms_wired.h>
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
+#endif
 #include "oplus_hal_mpc7022.h"
 #if IS_ENABLED(CONFIG_OPLUS_FEATURE_CHG_DEBUG_KIT)
 #include <debug-kit.h>

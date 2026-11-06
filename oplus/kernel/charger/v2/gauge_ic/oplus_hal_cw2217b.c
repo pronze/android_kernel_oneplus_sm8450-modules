@@ -45,7 +45,9 @@
 #include <oplus_mms_wired.h>
 #include <oplus_chg_monitor.h>
 #include "../monitor/oplus_chg_track.h"
+#if IS_ENABLED(CONFIG_OPLUS_CHG_TEST_KIT)
 #include "test-kit.h"
+#endif
 #include "oplus_hal_cw2217b.h"
 
 struct cw_battery *g_cw_bat = NULL;
