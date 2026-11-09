@@ -91,3 +91,4 @@ obj-$(CONFIG_OPLUS_FEATURE_KP_FREEZE_DETECT)     += common/kp_freeze_detect/
 obj-$(CONFIG_OPLUS_FEATURE_LAST_BOOT_REASON) += common/last_boot_reason/
 #endif /*OPLUS_FEATURE_LAST_BOOT_REASON*/
 
+KBUILD_CFLAGS += -Wframe-larger-than=2500
