@@ -29,6 +29,7 @@
 #include <linux/delay.h>
 #include <linux/ipc_logging.h>
 #include <linux/clk.h>
+#include <linux/regulator/consumer.h>
 #ifdef CONFIG_NFC_BOB1
 #include <linux/nvmem-consumer.h>
 #endif
@@ -328,7 +329,7 @@ int nfc_misc_register(struct nfc_dev *nfc_dev,
 #else
 int nfc_misc_register(struct nfc_dev *nfc_dev,
                       const struct file_operations *nfc_fops, int count,
-                      char *devname,char *classname);
+                      char *devname, const char *classname);
 #endif
 void nfc_misc_unregister(struct nfc_dev *nfc_dev, int count);
 int configure_gpio(unsigned int gpio, int flag);
